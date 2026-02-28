@@ -20,11 +20,18 @@ function QRscanner() {
     }
   };
 
+  const handleScanAgain = () => {
+    if (scannerRef.current) {
+      scannerRef.current.reactivate();
+    }
+    setShowDialog(false);
+  };
+
   const isLink =
     qrValue.startsWith('http://') || qrValue.startsWith('https://');
 
   return (
-    <View style={[styles.container, {paddingBottom: 126, margin: 0}]}>
+    <View style={styles.scannerContainer}>
       <QRCodeScanner
         ref={scannerRef}
         onRead={e => {
@@ -40,53 +47,28 @@ function QRscanner() {
         bottomContent={
           <Button
             title={`Flash ${light ? 'OFF' : 'ON'}`}
-            icon={{...styles.iconButtonHome, size: 20, name: 'qr-code-scanner'}}
+            icon={{...styles.iconButtonSmall, name: 'qr-code-scanner'}}
             iconContainerStyle={styles.iconButtonHomeContainer}
-            titleStyle={{...styles.titleButtonHome, fontSize: 20}}
-            buttonStyle={{...styles.buttonHome, height: 50}}
-            containerStyle={{
-              ...styles.buttonHomeContainer,
-              marginTop: 120,
-              marginBottom: 2,
-            }}
-            onPress={() => {
-              setLight(!light);
-            }}
+            titleStyle={styles.titleButtonSmall}
+            buttonStyle={styles.buttonSmall}
+            containerStyle={styles.buttonScannerContainer}
+            onPress={() => setLight(!light)}
           />
         }
       />
       <Dialog
         isVisible={showDialog}
-        onBackdropPress={() => setShowDialog(!showDialog)}>
-        <Dialog.Title
-          titleStyle={{color: '#000', fontSize: 25}}
-          title="Scanned QR:"
-        />
+        onBackdropPress={() => setShowDialog(false)}>
+        <Dialog.Title titleStyle={styles.dialogTitle} title="Scanned QR:" />
         {isLink ? (
-          <Text
-            style={{
-              color: 'blue',
-              textDecorationLine: 'underline',
-              fontSize: 25,
-            }}
-            onPress={handleLinkPress}
-          >
+          <Text style={styles.linkText} onPress={handleLinkPress}>
             {qrValue}
           </Text>
         ) : (
-          <Text style={{color: '#000', fontSize: 25}}>{qrValue}</Text>
+          <Text style={styles.qrText}>{qrValue}</Text>
         )}
-
         <Dialog.Actions>
-          <Dialog.Button
-            title="Scan Again"
-            onPress={() => {
-              if (scannerRef.current) {
-                scannerRef.current.reactivate();
-              }
-              setShowDialog(false);
-            }}
-          />
+          <Dialog.Button title="Scan Again" onPress={handleScanAgain} />
         </Dialog.Actions>
       </Dialog>
     </View>
